@@ -106,12 +106,13 @@ namespace ToDo.Api.Controllers
         /// <param name="toDoItem"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<ToDoDto>> PostToDoItem(ToDoDto toDoItem)
+        public async Task<ActionResult<ToDoDto>> PostToDoItem(ToDoForCreateDto toDoItem)
         {
             if (_context.ToDos == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.ToDos'  is null.");
             }
+
             var toDoEntity = new ToDoItem()
             {
                 Content = toDoItem.Content,
@@ -122,9 +123,9 @@ namespace ToDo.Api.Controllers
             _context.ToDos.Add(toDoEntity);
             await _context.SaveChangesAsync();
 
-            toDoItem.Id = toDoEntity.Id;
+            var createdTodo = new ToDoDto(toDoEntity);
 
-            return CreatedAtAction("GetToDoItem", new { id = toDoEntity.Id }, toDoItem);
+            return CreatedAtAction("GetToDoItem", new { id = createdTodo.Id }, createdTodo);
         }
 
         /// <summary>
