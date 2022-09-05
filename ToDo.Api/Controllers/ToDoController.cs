@@ -26,7 +26,7 @@ namespace ToDo.Api.Controllers
         {
             if (_context.ToDos == null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse("No to do items found"));
             }
             return await _context.ToDos.Select(t=> new ToDoDto(t)).ToListAsync();
         }
@@ -41,13 +41,13 @@ namespace ToDo.Api.Controllers
         {
             if (_context.ToDos == null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse("No to do items found"));
             }
             var toDoItem = await _context.ToDos.FindAsync(id);
 
             if (toDoItem == null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse($"No to do items found by id {id}"));
             }
 
             return new ToDoDto(toDoItem);
@@ -64,14 +64,14 @@ namespace ToDo.Api.Controllers
         {
             if (id != toDoItem.Id)
             {
-                return BadRequest();
+                return BadRequest(new ErrorResponse("Submitted to do item id doesn't match request id"));
             }
 
             var item = await _context.ToDos.FirstOrDefaultAsync(t => t.Id == id);
 
             if (item == null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse($"No to do items found by id {id}"));
             }
 
             item.UserId = toDoItem.UserId;
@@ -89,7 +89,7 @@ namespace ToDo.Api.Controllers
             {
                 if (!ToDoItemExists(id))
                 {
-                    return NotFound();
+                    return NotFound(new ErrorResponse($"No to do items found by id {id}"));
                 }
                 else
                 {
@@ -110,7 +110,7 @@ namespace ToDo.Api.Controllers
         {
             if (_context.ToDos == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.ToDos'  is null.");
+                return StatusCode(500, $"Server error - database issue");
             }
 
             var toDoEntity = new ToDoItem()
@@ -138,12 +138,12 @@ namespace ToDo.Api.Controllers
         {
             if (_context.ToDos == null)
             {
-                return NotFound();
+                return StatusCode(500, $"Server error - database issue");
             }
             var toDoItem = await _context.ToDos.FindAsync(id);
             if (toDoItem == null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse($"No to do items found by id {id}"));
             }
 
             _context.ToDos.Remove(toDoItem);

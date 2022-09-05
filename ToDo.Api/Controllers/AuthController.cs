@@ -28,7 +28,7 @@ namespace ToDo.Api.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse("User not found"));
             }
 
             if (await _userManager.CheckPasswordAsync(user, password))
@@ -37,7 +37,7 @@ namespace ToDo.Api.Controllers
             }
             else
             {
-                return BadRequest("Wrong password");
+                return BadRequest(new ErrorResponse("Wrong password"));
             }
         }
 
@@ -51,12 +51,12 @@ namespace ToDo.Api.Controllers
         {
             if (await _userManager.FindByNameAsync(user.UserName) != null)
             {
-                return BadRequest($"User already exists with user name {user.UserName}");
+                return BadRequest(new ErrorResponse($"User already exists with user name {user.UserName}"));
             }
 
             if (await _userManager.FindByEmailAsync(user.Email) != null)
             {
-                return BadRequest($"User already exists with email {user.Email}");
+                return BadRequest(new ErrorResponse($"User already exists with email {user.Email}"));
             }
 
             var userIdentity = new IdentityUser(user.UserName);
@@ -66,7 +66,7 @@ namespace ToDo.Api.Controllers
 
             if (!rez.Succeeded)
             {
-                return BadRequest(string.Join(';', rez.Errors));
+                return BadRequest(new ErrorResponse(string.Join(';', rez.Errors)));
             }
             else
             {
